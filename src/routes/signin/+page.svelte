@@ -8,6 +8,7 @@
 		PUBLIC_SURREAL_NAMESPACE,
 	} from "$env/static/public";
 	import { FormState } from "$lib/globals.d.ts";
+	import Nav from "$lib/Nav.svelte";
 
 	const db = new Surreal(`${PUBLIC_SURREAL_URL}/rpc`);
 
@@ -19,20 +20,30 @@
 		Signup,
 	}
 	let signinOrUp = SignInUp.Signin;
-	let email: string, password: string, passwordConfirmation: string;
+	let email: string;
+	let password: string;
+	let name: string;
+	let phone: string;
+	let passwordConfirmation: string;
 
-	async function signin(email: string, password: string): Promise<void> {
+	user.subscribe($user => {
+		if ($user?.email) {
+			goto(`/${$user.email}/dashboard`)
+		}
+	})
+
+	async function signin(): Promise<void> {
 		state = FormState.Submitted;
 		try {
-			await db.signin({
+			let jwt = await db.signin({
 				NS: PUBLIC_SURREAL_NAMESPACE,
 				DB: PUBLIC_SURREAL_DATABASE,
 				SC: "end_user",
 				email,
-				pass: password,
+				password,
 			});
-			user.set({ email, password });
-			goto("/search");
+			user.set({ email, password, jwt });
+			goto(`${email}/dashboard`);
 		} catch (e) {
 			state = FormState.Error;
 			error = e.toString();
@@ -40,18 +51,20 @@
 		}
 	}
 
-	async function signup(email: string, password: string): Promise<void> {
+	async function signup(): Promise<void> {
 		state = FormState.Submitted;
 		try {
-			await db.signup({
+			let jwt = await db.signup({
 				NS: PUBLIC_SURREAL_NAMESPACE,
 				DB: PUBLIC_SURREAL_DATABASE,
 				SC: "end_user",
+				name,
+				phone,
 				email,
-				pass: password,
+				password,
 			});
-			user.set({ email, password });
-			goto("/profile");
+			user.set({ email, password, jwt });
+			goto(`${email}/dashboard`);
 		} catch (e) {
 			state = FormState.Error;
 			error = e.toString();
@@ -70,323 +83,265 @@
 	}
 </script>
 
-<section
-	class="bg-[url('https://flowbite.s3.amazonaws.com/blocks/marketing-ui/authentication/background.jpg')] bg-no-repeat bg-cover bg-center bg-gray-700 bg-blend-multiply bg-opacity-60"
->
-	<div
-		class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen pt:mt-0"
-	>
-		<a
-			href="#"
-			class="flex items-center mb-6 text-2xl font-semibold text-white"
-		>
-			<svg
-				class="h-8 mr-2"
-				viewBox="0 0 33 33"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<path
-					d="M25.2696 13.126C25.1955 13.6364 24.8589 14.3299 24.4728 14.9328C23.9856 15.6936 23.2125 16.2264 22.3276 16.4114L18.43 17.2265C17.8035 17.3575 17.2355 17.6853 16.8089 18.1621L14.2533 21.0188C13.773 21.5556 13.4373 21.4276 13.4373 20.7075C13.4315 20.7342 12.1689 23.9903 15.5149 25.9202C16.8005 26.6618 18.6511 26.3953 19.9367 25.6538L26.7486 21.7247C29.2961 20.2553 31.0948 17.7695 31.6926 14.892C31.7163 14.7781 31.7345 14.6639 31.7542 14.5498L25.2696 13.126Z"
-					fill="url(#paint0_linear_11430_22515)"
-				/><path
-					d="M23.5028 9.20133C24.7884 9.94288 25.3137 11.0469 25.3137 12.53C25.3137 12.7313 25.2979 12.9302 25.2694 13.1261L28.0141 14.3051L31.754 14.5499C32.2329 11.7784 31.2944 8.92561 29.612 6.65804C28.3459 4.9516 26.7167 3.47073 24.7581 2.34097C23.167 1.42325 21.5136 0.818599 19.8525 0.486816L17.9861 2.90382L17.3965 5.67918L23.5028 9.20133Z"
-					fill="url(#paint1_linear_11430_22515)"
-				/><path
-					d="M1.5336 11.2352C1.5329 11.2373 1.53483 11.238 1.53556 11.2358C1.67958 10.8038 1.86018 10.3219 2.08564 9.80704C3.26334 7.11765 5.53286 5.32397 8.32492 4.40943C11.117 3.49491 14.1655 3.81547 16.7101 5.28323L17.3965 5.67913L19.8525 0.486761C12.041 -1.07341 4.05728 3.51588 1.54353 11.2051C1.54233 11.2087 1.53796 11.2216 1.5336 11.2352Z"
-					fill="url(#paint2_linear_11430_22515)"
-				/><path
-					d="M19.6699 25.6538C18.3843 26.3953 16.8003 26.3953 15.5147 25.6538C15.3402 25.5531 15.1757 25.4399 15.0201 25.3174L12.7591 26.8719L10.8103 30.0209C12.9733 31.821 15.7821 32.3997 18.589 32.0779C20.7013 31.8357 22.7995 31.1665 24.7582 30.0368C26.3492 29.1191 27.7 27.9909 28.8182 26.7195L27.6563 23.8962L25.7762 22.1316L19.6699 25.6538Z"
-					fill="url(#paint3_linear_11430_22515)"
-				/><path
-					d="M15.0201 25.3175C14.0296 24.5373 13.4371 23.3406 13.4371 22.0588V21.931V11.2558C13.4371 10.6521 13.615 10.5494 14.1384 10.8513C13.3323 10.3864 11.4703 8.79036 9.17118 10.1165C7.88557 10.858 6.8269 12.4949 6.8269 13.978V21.8362C6.8269 24.775 8.34906 27.8406 10.5445 29.7966C10.6313 29.874 10.7212 29.9469 10.8103 30.0211L15.0201 25.3175Z"
-					fill="url(#paint4_linear_11430_22515)"
-				/><path
-					d="M28.6604 5.49565C28.6589 5.49395 28.6573 5.49532 28.6589 5.49703C28.9613 5.83763 29.2888 6.23485 29.6223 6.68734C31.3648 9.05099 32.0158 12.0447 31.4126 14.9176C30.8093 17.7906 29.0071 20.2679 26.4625 21.7357L25.7761 22.1316L28.8181 26.7195C34.0764 20.741 34.09 11.5388 28.6815 5.51929C28.6789 5.51641 28.67 5.50622 28.6604 5.49565Z"
-					fill="url(#paint5_linear_11430_22515)"
-				/><path
-					d="M7.09355 13.978C7.09354 12.4949 7.88551 11.1244 9.17113 10.3829C9.34564 10.2822 9.52601 10.1965 9.71002 10.1231L9.49304 7.38962L7.96861 4.26221C5.32671 5.23364 3.1897 7.24125 2.06528 9.83067C1.2191 11.7793 0.75001 13.9294 0.75 16.1888C0.75 18.0243 1.05255 19.7571 1.59553 21.3603L4.62391 21.7666L7.09355 21.0223V13.978Z"
-					fill="url(#paint6_linear_11430_22515)"
-				/><path
-					d="M9.71016 10.1231C10.8817 9.65623 12.2153 9.74199 13.3264 10.3829L13.4372 10.4468L22.3326 15.5777C22.9566 15.9376 22.8999 16.2918 22.1946 16.4392L22.7078 16.332C23.383 16.1908 23.9999 15.8457 24.4717 15.3428C25.2828 14.4782 25.5806 13.4351 25.5806 12.5299C25.5806 11.0468 24.7886 9.67634 23.503 8.93479L16.6911 5.00568C14.1436 3.53627 11.0895 3.22294 8.29622 4.14442C8.18572 4.18087 8.07756 4.2222 7.96875 4.26221L9.71016 10.1231Z"
-					fill="url(#paint7_linear_11430_22515)"
-				/><path
-					d="M20.0721 31.8357C20.0744 31.8352 20.0739 31.8332 20.0717 31.8337C19.6252 31.925 19.1172 32.0097 18.5581 32.0721C15.638 32.3978 12.7174 31.4643 10.5286 29.5059C8.33986 27.5474 7.09347 24.7495 7.09348 21.814L7.09347 21.0222L1.59546 21.3602C4.1488 28.8989 12.1189 33.5118 20.0411 31.8421C20.0449 31.8413 20.0582 31.8387 20.0721 31.8357Z"
-					fill="url(#paint8_linear_11430_22515)"
-				/>
-				<defs>
-					<linearGradient
-						id="paint0_linear_11430_22515"
-						x1="20.8102"
-						y1="23.9532"
-						x2="23.9577"
-						y2="12.9901"
-						gradientUnits="userSpaceOnUse"
-						><stop stop-color="#1724C9" /><stop
-							offset="1"
-							stop-color="#1C64F2"
-						/></linearGradient
-					>
-					<linearGradient
-						id="paint1_linear_11430_22515"
-						x1="28.0593"
-						y1="10.5837"
-						x2="19.7797"
-						y2="2.33321"
-						gradientUnits="userSpaceOnUse"
-						><stop stop-color="#1C64F2" /><stop
-							offset="1"
-							stop-color="#0092FF"
-						/></linearGradient
-					>
-					<linearGradient
-						id="paint2_linear_11430_22515"
-						x1="16.9145"
-						y1="5.2045"
-						x2="4.42432"
-						y2="5.99375"
-						gradientUnits="userSpaceOnUse"
-						><stop stop-color="#0092FF" /><stop
-							offset="1"
-							stop-color="#45B2FF"
-						/></linearGradient
-					>
-					<linearGradient
-						id="paint3_linear_11430_22515"
-						x1="16.0698"
-						y1="28.846"
-						x2="27.2866"
-						y2="25.8192"
-						gradientUnits="userSpaceOnUse"
-						><stop stop-color="#1C64F2" /><stop
-							offset="1"
-							stop-color="#0092FF"
-						/></linearGradient
-					>
-					<linearGradient
-						id="paint4_linear_11430_22515"
-						x1="8.01881"
-						y1="15.8661"
-						x2="15.9825"
-						y2="24.1181"
-						gradientUnits="userSpaceOnUse"
-						><stop stop-color="#1724C9" /><stop
-							offset="1"
-							stop-color="#1C64F2"
-						/></linearGradient
-					>
-					<linearGradient
-						id="paint5_linear_11430_22515"
-						x1="26.2004"
-						y1="21.8189"
-						x2="31.7569"
-						y2="10.6178"
-						gradientUnits="userSpaceOnUse"
-						><stop stop-color="#0092FF" /><stop
-							offset="1"
-							stop-color="#45B2FF"
-						/></linearGradient
-					>
-					<linearGradient
-						id="paint6_linear_11430_22515"
-						x1="6.11387"
-						y1="9.31427"
-						x2="3.14054"
-						y2="20.4898"
-						gradientUnits="userSpaceOnUse"
-						><stop stop-color="#1C64F2" /><stop
-							offset="1"
-							stop-color="#0092FF"
-						/></linearGradient
-					>
-					<linearGradient
-						id="paint7_linear_11430_22515"
-						x1="21.2932"
-						y1="8.78271"
-						x2="10.4278"
-						y2="11.488"
-						gradientUnits="userSpaceOnUse"
-						><stop stop-color="#1724C9" /><stop
-							offset="1"
-							stop-color="#1C64F2"
-						/></linearGradient
-					>
-					<linearGradient
-						id="paint8_linear_11430_22515"
-						x1="7.15667"
-						y1="21.5399"
-						x2="14.0824"
-						y2="31.9579"
-						gradientUnits="userSpaceOnUse"
-						><stop stop-color="#0092FF" /><stop
-							offset="1"
-							stop-color="#45B2FF"
-						/></linearGradient
-					>
-				</defs>
-			</svg>
-			Flowbite
-		</a>
-		<div
-			class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800"
-		>
+<Nav />
 
-			{#if state == FormState.Error}
-				<div class="rounded-md bg-red-50 p-4">
-					<div class="flex">
-						<div class="flex-shrink-0">
-							<!-- Heroicon name: mini/x-circle -->
+<!--
+  This example requires updating your template:
+
+  ```
+  <html class="h-full bg-gray-50">
+  <body class="h-full">
+  ```
+-->
+<div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
+	<div class="sm:mx-auto sm:w-full sm:max-w-md">
+		<img class="mx-auto h-12 w-auto" src="/Sweif.png" alt="Your Company" />
+		<h2
+			class="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900"
+		>
+			{#if signinOrUp == SignInUp.Signin}
+				Sign in
+			{:else}
+				Sign up
+			{/if}
+		</h2>
+		<p class="mt-2 text-center text-sm text-gray-600">
+			Or
+			{#if signinOrUp == SignInUp.Signin}
+				<button
+					type="button"
+					class="font-medium text-primary-600 hover:text-primary-500"
+					on:click={() => (signinOrUp = SignInUp.Signup)}
+					>Create an account</button
+				>
+			{:else}
+				<button
+					type="button"
+					class="font-medium text-primary-600 hover:text-primary-500"
+					on:click={() => (signinOrUp = SignInUp.Signin)}
+					>Sign in</button
+				>
+			{/if}
+		</p>
+	</div>
+
+	<div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+		<div class="bg-white px-4 py-8 shadow sm:rounded-lg sm:px-10">
+			<form class="space-y-6" action="#" method="POST">
+				{#if signinOrUp == SignInUp.Signup}
+					<div>
+						<label
+							for="name"
+							class="block text-sm font-medium leading-6 text-gray-900"
+							>Name</label
+						>
+						<div class="mt-2">
+							<input
+								id="name"
+								name="name"
+								type="name"
+								autocomplete="name"
+								required
+								class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+								bind:value={name}
+							/>
+						</div>
+					</div>
+
+					<div class="sm:col-span-2">
+						<label
+							for="country"
+							class="block text-sm font-medium leading-6 text-gray-900"
+							>Phone number</label
+						>
+						<div class="mt-2">
+							<input
+								id="phone"
+								name="phone"
+								type="text"
+								autocomplete="phone"
+								required
+								class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+								bind:value={phone}
+							/>
+						</div>
+					</div>
+				{/if}
+
+				<div>
+					<label
+						for="email"
+						class="block text-sm font-medium leading-6 text-gray-900"
+						>Email</label
+					>
+					<div class="mt-2">
+						<input
+							id="email"
+							name="email"
+							type="email"
+							autocomplete="email"
+							required
+							class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+							bind:value={email}
+						/>
+					</div>
+				</div>
+
+				<div>
+					<label
+						for="password"
+						class="block text-sm font-medium leading-6 text-gray-900"
+						>Password</label
+					>
+					<div class="mt-2">
+						<input
+							id="password"
+							name="password"
+							type="password"
+							autocomplete="current-password"
+							required
+							class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+							bind:value={password}
+						/>
+					</div>
+				</div>
+
+				{#if signinOrUp == SignInUp.Signup}
+					<div>
+						<label
+							for="passwordConfirmation"
+							class="block text-sm font-medium leading-6 text-gray-900"
+							>Password confirmation</label
+						>
+						<div class="mt-2">
+							<input
+								id="passwordConfirmation"
+								name="passwordConfirmation"
+								type="password"
+								required
+								class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+								bind:value={passwordConfirmation}
+							/>
+						</div>
+					</div>
+				{/if}
+
+				<div class="flex items-center justify-between">
+					<div class="flex items-center">
+						<input
+							id="remember-me"
+							name="remember-me"
+							type="checkbox"
+							class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-600"
+						/>
+						<label for="remember-me" class="ml-2 block text-sm text-gray-900"
+							>Remember me</label
+						>
+					</div>
+
+					<div class="text-sm">
+						<a
+							href="#"
+							class="font-medium text-primary-600 hover:text-primary-500"
+							>Forgot password?</a
+						>
+					</div>
+				</div>
+
+				<div>
+					{#if signinOrUp == SignInUp.Signin}
+						<button
+							type="button"
+							on:click={() => signin()}
+							class="flex w-full justify-center rounded-md bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+							>Sign in</button
+						>
+					{:else}
+						<button
+							type="button"
+							on:click={() => signup()}
+							class="flex w-full justify-center rounded-md bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+							>Sign up</button
+						>
+					{/if}
+				</div>
+			</form>
+
+			<!--
+			<div class="mt-6">
+				<div class="relative">
+					<div class="absolute inset-0 flex items-center">
+						<div class="w-full border-t border-gray-300" />
+					</div>
+					<div class="relative flex justify-center text-sm">
+						<span class="bg-white px-2 text-gray-500">Or continue with</span>
+					</div>
+				</div>
+
+				<div class="mt-6 grid grid-cols-3 gap-3">
+					<div>
+						<a
+							href="#"
+							class="inline-flex w-full justify-center rounded-md bg-white px-4 py-2 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0"
+						>
+							<span class="sr-only">Sign in with Facebook</span>
 							<svg
-								class="h-5 w-5 text-red-400"
-								xmlns="http://www.w3.org/2000/svg"
-								viewBox="0 0 20 20"
+								class="h-5 w-5"
 								fill="currentColor"
+								viewBox="0 0 20 20"
 								aria-hidden="true"
 							>
 								<path
 									fill-rule="evenodd"
-									d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+									d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z"
 									clip-rule="evenodd"
 								/>
 							</svg>
-						</div>
-						<div class="ml-3">
-							<h3 class="text-sm font-medium text-red-800">
-								There were errors with your submission
-							</h3>
-							<div class="mt-2 text-sm text-red-700">
-								<ul class="list-disc space-y-1 pl-5">
-									<li>{error}</li>
-								</ul>
-							</div>
-						</div>
+						</a>
+					</div>
+
+					<div>
+						<a
+							href="#"
+							class="inline-flex w-full justify-center rounded-md bg-white px-4 py-2 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0"
+						>
+							<span class="sr-only">Sign in with Twitter</span>
+							<svg
+								class="h-5 w-5"
+								fill="currentColor"
+								viewBox="0 0 20 20"
+								aria-hidden="true"
+							>
+								<path
+									d="M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84"
+								/>
+							</svg>
+						</a>
+					</div>
+
+					<div>
+						<a
+							href="#"
+							class="inline-flex w-full justify-center rounded-md bg-white px-4 py-2 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0"
+						>
+							<span class="sr-only">Sign in with GitHub</span>
+							<svg
+								class="h-5 w-5"
+								fill="currentColor"
+								viewBox="0 0 20 20"
+								aria-hidden="true"
+							>
+								<path
+									fill-rule="evenodd"
+									d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z"
+									clip-rule="evenodd"
+								/>
+							</svg>
+						</a>
 					</div>
 				</div>
-			{/if}
-
-			<div class="p-6 space-y-4 md:space-y-6 lg:space-y-8 sm:p-8">
-				{#if signinOrUp == SignInUp.Signup}
-				<h2
-					class="text-xl font-bold leading-tight tracking-tight text-center text-gray-900 md:text-2xl dark:text-white"
-				>
-					Create your Free Account
-				</h2>
-				{:else}
-				<h2
-					class="text-xl font-bold leading-tight tracking-tight text-center text-gray-900 md:text-2xl dark:text-white"
-				>
-					Signin
-				</h2>
-				{/if}
-				<form class="space-y-4 md:space-y-6" action="#">
-					<div>
-						<label
-							for="email"
-							class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-							>Your email</label
-						>
-						<input
-							type="email"
-							name="email"
-							id="email"
-							class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-							placeholder="name@company.com"
-							required
-							bind:value={email}
-						/>
-					</div>
-					<div>
-						<label
-							for="username"
-							class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-							>Password</label
-						>
-						<input
-							type="password"
-							name="password"
-							id="password"
-							placeholder="••••••••"
-							class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-							required
-							bind:value={password}
-						/>
-					</div>
-					{#if signinOrUp == SignInUp.Signup}
-					<div>
-						<label
-							for="confirm-password"
-							class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-							>Confirm password</label
-						>
-						<input
-							type="confirm-password"
-							name="confirm-password"
-							id="confirm-password"
-							placeholder="••••••••"
-							class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-							required
-							bind:value={passwordConfirmation}
-						/>
-					</div>
-					{/if}
-					<div class="flex items-start">
-						<div class="flex items-center h-5">
-							<input
-								id="newsletter"
-								aria-describedby="newsletter"
-								type="checkbox"
-								class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
-								required
-							/>
-						</div>
-						<div class="ml-3 text-sm">
-							<label
-								for="newsletter"
-								class="font-light text-gray-500 dark:text-gray-300"
-								>I accept the <a
-									class="font-medium text-primary-600 hover:underline dark:text-primary-500"
-									href="#">Terms and Conditions</a
-								></label
-							>
-						</div>
-					</div>
-					{#if signinOrUp == SignInUp.Signup}
-					<button
-						type="button"
-						class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-						on:click={() => signup(email, password)}
-						>Create an account</button
-					>
-					<p
-						class="text-sm font-light text-center text-gray-500 dark:text-gray-300"
-					>
-						<button
-							type="button"
-							on:click={() => signinOrUp = SignInUp.Signin}
-							class="font-medium text-primary-600 hover:underline dark:text-primary-500"
-							>Already have an account?</button
-						>
-					</p>
-					{:else}
-						<button
-							type="button"
-							class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-							on:click={() => signin(email, password)}
-							>Sign in</button
-						>
-						<p
-							class="text-sm font-light text-center text-gray-500 dark:text-gray-300"
-						>
-							<button
-								type="button"
-								on:click={() => signinOrUp = SignInUp.Signup}
-								class="font-medium text-primary-600 hover:underline dark:text-primary-500"
-								>no account yet?</button
-							>
-						</p>
-					{/if}
-				</form>
 			</div>
+			-->
 		</div>
 	</div>
-</section>
+</div>

@@ -1,11 +1,5 @@
 <script lang="ts">
   import Contact from "$lib/Contact.svelte";
-  import { searchQuery } from "$lib/../stores";
-  import { goto } from "$app/navigation";
-
-  async function search() {
-    goto(`/search?query=${$searchQuery}`);
-  }
 </script>
 
 <div class="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 h-screen flex items-center">

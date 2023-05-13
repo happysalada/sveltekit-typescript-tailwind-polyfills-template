@@ -1,15 +1,5 @@
 <script lang="ts">
-	import { user } from "$lib/../stores";
-	import { goto } from "$app/navigation";
-	import Surreal from "surrealdb.js";
-	import { PUBLIC_SURREAL_URL } from "$env/static/public";
-
-	function signout(): void {
-		const db = new Surreal(`${PUBLIC_SURREAL_URL}/rpc`);
-		db.invalidate();
-		user.set({});
-		goto("/");
-	}
+	import Logo from "$lib/Logo.svelte";
 
 	let isDropdownOpen = false;
 </script>
@@ -22,11 +12,7 @@
 		<div class="flex lg:flex-1">
 			<a href="/" class="">
 				<span class="sr-only">Your Company</span>
-				<img
-					class="h-8"
-					src="/Sweif.png"
-					alt=""
-				/>
+				<Logo classes="h-12 w-20 rounded-lg" />
 			</a>
 		</div>
 		<div class="flex lg:hidden">
@@ -54,11 +40,11 @@
 		</div>
 		<div class="hidden lg:flex lg:gap-x-12">
 			<a href="/" class="text-sm font-semibold leading-6 text-gray-900"
-				>Product</a
+				>Hero</a
 			>
 
 			<a href="#features" class="text-sm font-semibold leading-6 text-gray-900"
-				>Featuers</a
+				>Product</a
 			>
 
 			<a href="/#contact" class="text-sm font-semibold leading-6 text-gray-900"
@@ -66,17 +52,9 @@
 			>
 		</div>
 		<div class="hidden lg:flex lg:flex-1 lg:justify-end">
-			{#if $user?.email}
-				<button
-					class="text-sm font-semibold leading-6 text-gray-900"
-					on:click={signout}
-					>Sign out <span aria-hidden="true">&rarr;</span></button
-				>
-			{:else}
-				<a href="/signin" class="text-sm font-semibold leading-6 text-gray-900"
-					>Log in <span aria-hidden="true">&rarr;</span></a
-				>
-			{/if}
+			<a href="/signin" class="rounded-md bg-primary-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+				>Log in <span aria-hidden="true">&rarr;</span></a
+			>
 		</div>
 	</nav>
 	<!-- Mobile menu, show/hide based on menu open state. -->
@@ -93,12 +71,8 @@
 		>
 			<div class="flex items-center justify-between">
 				<a href="/" class="-m-1.5 p-1.5">
-					<span class="sr-only">Your Company</span>
-					<img
-						class="h-8 w-auto"
-						src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-						alt=""
-					/>
+					<span class="sr-only">Company</span>
+					<Logo classes="h-12 w-20 rounded-lg" />
 				</a>
 				<button
 					type="button"
@@ -128,7 +102,7 @@
 						<a
 							href="/"
 							class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-							>Product</a
+							>Hero</a
 						>
 
 						<a
@@ -145,19 +119,11 @@
 
 					</div>
 					<div class="py-6">
-						{#if $user?.email}
-							<button
-								class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-								on:click={signout}
-								>Sign out</button
-							>
-						{:else}
-							<a
-								href="/signin"
-							class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-								>Log in</a
-							>
-						{/if}
+						<a
+							href="/signin"
+						class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+							>Log in</a
+						>
 					</div>
 				</div>
 			</div>

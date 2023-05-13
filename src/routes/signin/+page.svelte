@@ -1,86 +1,24 @@
 <script lang="ts">
-	import { user } from "$lib/../stores";
-	import Surreal from "surrealdb.js";
-	import { goto } from "$app/navigation";
-	import {
-		PUBLIC_SURREAL_URL,
-		PUBLIC_SURREAL_DATABASE,
-		PUBLIC_SURREAL_NAMESPACE,
-	} from "$env/static/public";
-	import { FormState } from "$lib/globals.d.ts";
+	import { superForm } from "sveltekit-superforms/client";
+
+	import type { PageData } from "./$types";
+	// import { goto } from "$app/navigation";
+	// import { user } from "$lib/stores";
 	import Nav from "$lib/Nav.svelte";
+	import * as EmailValidator from 'email-validator';
 
-	const db = new Surreal(`${PUBLIC_SURREAL_URL}/rpc`);
+	export let data: PageData;
 
-	let error: undefined | string;
-	let state = FormState.Ready;
-
-	enum SignInUp {
-		Signin,
-		Signup,
-	}
-	let signinOrUp = SignInUp.Signin;
-	let email: string;
-	let password: string;
-	let name: string;
-	let phone: string;
-	let passwordConfirmation: string;
-
-	user.subscribe($user => {
-		if ($user?.email) {
-			goto(`/${$user.email}/dashboard`)
-		}
-	})
-
-	async function signin(): Promise<void> {
-		state = FormState.Submitted;
-		try {
-			let jwt = await db.signin({
-				NS: PUBLIC_SURREAL_NAMESPACE,
-				DB: PUBLIC_SURREAL_DATABASE,
-				SC: "end_user",
-				email,
-				password,
-			});
-			user.set({ email, password, jwt });
-			goto(`${email}/dashboard`);
-		} catch (e) {
-			state = FormState.Error;
-			error = e.toString();
-			console.log(e);
-		}
-	}
-
-	async function signup(): Promise<void> {
-		state = FormState.Submitted;
-		try {
-			let jwt = await db.signup({
-				NS: PUBLIC_SURREAL_NAMESPACE,
-				DB: PUBLIC_SURREAL_DATABASE,
-				SC: "end_user",
-				name,
-				phone,
-				email,
-				password,
-			});
-			user.set({ email, password, jwt });
-			goto(`${email}/dashboard`);
-		} catch (e) {
-			state = FormState.Error;
-			error = e.toString();
-			console.log(e);
-		}
-	}
-
-	function validation(): void {
-		if (password != passwordConfirmation) {
-			state = FormState.Error;
-			error = "password confirmation does not match password";
-		} else {
-			state = FormState.Ready;
-			error = undefined;
-		}
-	}
+	const { form, errors, constraints, enhance } = superForm(data.form, {
+		validators: {
+			email: (input) => EmailValidator.validate(input) ? undefined : 'Email is invalid',
+			password: (input) => input.length < 6 ? 'Password is invalid' : undefined,
+		},
+		onError({result, message}) {
+			console.log(result)
+			console.log(message)
+		},
+	});
 </script>
 
 <Nav />
@@ -95,78 +33,25 @@
 -->
 <div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
 	<div class="sm:mx-auto sm:w-full sm:max-w-md">
-		<img class="mx-auto h-12 w-auto" src="" alt="Your Company" />
+		<img class="mx-auto h-12 w-auto" src="/Sweif.png" alt="Your Company" />
 		<h2
 			class="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900"
 		>
-			{#if signinOrUp == SignInUp.Signin}
-				Sign in
-			{:else}
-				Sign up
-			{/if}
+			Login
 		</h2>
 		<p class="mt-2 text-center text-sm text-gray-600">
 			Or
-			{#if signinOrUp == SignInUp.Signin}
-				<button
-					type="button"
-					class="font-medium text-primary-600 hover:text-primary-500"
-					on:click={() => (signinOrUp = SignInUp.Signup)}
-					>Create an account</button
-				>
-			{:else}
-				<button
-					type="button"
-					class="font-medium text-primary-600 hover:text-primary-500"
-					on:click={() => (signinOrUp = SignInUp.Signin)}
-					>Sign in</button
-				>
-			{/if}
+			<a
+				href="/signup"
+				class="font-medium text-primary-600 hover:text-primary-500 text-xl"
+				>Signup</a
+			>
 		</p>
 	</div>
 
 	<div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
 		<div class="bg-white px-4 py-8 shadow sm:rounded-lg sm:px-10">
-			<form class="space-y-6" action="#" method="POST">
-				{#if signinOrUp == SignInUp.Signup}
-					<div>
-						<label
-							for="name"
-							class="block text-sm font-medium leading-6 text-gray-900"
-							>Name</label
-						>
-						<div class="mt-2">
-							<input
-								id="name"
-								name="name"
-								type="name"
-								autocomplete="name"
-								required
-								class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-								bind:value={name}
-							/>
-						</div>
-					</div>
-
-					<div class="sm:col-span-2">
-						<label
-							for="country"
-							class="block text-sm font-medium leading-6 text-gray-900"
-							>Phone number</label
-						>
-						<div class="mt-2">
-							<input
-								id="phone"
-								name="phone"
-								type="text"
-								autocomplete="phone"
-								required
-								class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-								bind:value={phone}
-							/>
-						</div>
-					</div>
-				{/if}
+			<form class="space-y-6" method="POST" use:enhance>
 
 				<div>
 					<label
@@ -174,17 +59,44 @@
 						class="block text-sm font-medium leading-6 text-gray-900"
 						>Email</label
 					>
-					<div class="mt-2">
+					<div class="relative mt-2 rounded-md shadow-sm">
 						<input
-							id="email"
-							name="email"
 							type="email"
+							name="email"
+							id="email"
+							class="block w-full rounded-md border-0 py-1.5 pr-10 {$errors.email ? 'text-red-900 placeholder:text-red-300 ring-red-300 focus:ring-red-500' : 'text-gray-900 ring-gray-300 focus:ring-primary-500'} ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
+							placeholder="you@example.com"
+							aria-invalid={$errors.email != undefined}
+							aria-describedby={$errors.email != undefined ? "email-error" : ''}
 							autocomplete="email"
-							required
-							class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-							bind:value={email}
+							data-invalid={$errors.email}
+							bind:value={$form.email}
+							{...$constraints.email}
 						/>
+						{#if $errors.email}
+						<div
+							class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
+						>
+							<svg
+								class="h-5 w-5 text-red-500"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+								aria-hidden="true"
+							>
+								<path
+									fill-rule="evenodd"
+									d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z"
+									clip-rule="evenodd"
+								/>
+							</svg>
+						</div>
+						{/if}
 					</div>
+					{#if $errors.email}
+					<p class="mt-2 text-sm text-red-600" id="email-error">
+						{$errors.email}
+					</p>
+					{/if}
 				</div>
 
 				<div>
@@ -199,32 +111,38 @@
 							name="password"
 							type="password"
 							autocomplete="current-password"
-							required
-							class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-							bind:value={password}
+							class="block w-full rounded-md border-0 py-1.5 pr-10 {$errors.email ? 'text-red-900 placeholder:text-red-300 ring-red-300 focus:ring-red-500' : 'text-gray-900 ring-gray-300 focus:ring-primary-500'} ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
+							aria-invalid={$errors.password != undefined}
+							aria-describedby={$errors.password != undefined ? "password-error" : ''}
+							data-invalid={$errors.password}
+							bind:value={$form.password}
+							{...$constraints.password}
 						/>
-					</div>
-				</div>
-
-				{#if signinOrUp == SignInUp.Signup}
-					<div>
-						<label
-							for="passwordConfirmation"
-							class="block text-sm font-medium leading-6 text-gray-900"
-							>Password confirmation</label
+						{#if $errors.password}
+						<div
+							class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
 						>
-						<div class="mt-2">
-							<input
-								id="passwordConfirmation"
-								name="passwordConfirmation"
-								type="password"
-								required
-								class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-								bind:value={passwordConfirmation}
-							/>
+							<svg
+								class="h-5 w-5 text-red-500"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+								aria-hidden="true"
+							>
+								<path
+									fill-rule="evenodd"
+									d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z"
+									clip-rule="evenodd"
+								/>
+							</svg>
 						</div>
+						{/if}
 					</div>
-				{/if}
+					{#if $errors.password}
+					<p class="mt-2 text-sm text-red-600" id="password-error">
+						{$errors.password}
+					</p>
+					{/if}
+				</div>
 
 				<div class="flex items-center justify-between">
 					<div class="flex items-center">
@@ -243,27 +161,16 @@
 						<a
 							href="#"
 							class="font-medium text-primary-600 hover:text-primary-500"
-							>Forgot password?</a
+							>Forgot your password?</a
 						>
 					</div>
 				</div>
 
 				<div>
-					{#if signinOrUp == SignInUp.Signin}
-						<button
-							type="button"
-							on:click={() => signin()}
-							class="flex w-full justify-center rounded-md bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
-							>Sign in</button
-						>
-					{:else}
-						<button
-							type="button"
-							on:click={() => signup()}
-							class="flex w-full justify-center rounded-md bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
-							>Sign up</button
-						>
-					{/if}
+					<button
+						class="flex w-full justify-center rounded-md bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+						>Sign in</button
+					>
 				</div>
 			</form>
 

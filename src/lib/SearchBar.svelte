@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { properties, displayProperties, searchQuery } from "$lib/../stores";
+  import { properties, displayProperties, searchQuery } from "$lib/stores";
   function filter() {
     $displayProperties = $properties.filter(property => matchObject($searchQuery, property))
   }

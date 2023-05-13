@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Property } from '$lib/globals.d.ts'
-  import { selectedProperty } from '$lib/../stores';
+  import { selectedProperty } from '$lib/stores';
   let dropdownOpen = false
 </script>
 

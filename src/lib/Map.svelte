@@ -1,7 +1,7 @@
 <script lang="ts">
   import { LeafletMap, TileLayer, Icon, Marker } from 'svelte-leafletjs?client'
   import 'leaflet/dist/leaflet.css'
-  import { selectedProperty, displayProperties } from "$lib/../stores";
+  import { selectedProperty, displayProperties } from "$lib/stores";
   import { browser } from "$app/environment"
 
   const mapOptions = {

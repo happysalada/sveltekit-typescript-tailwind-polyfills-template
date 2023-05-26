@@ -20,8 +20,8 @@ dependencies:
     specifier: ^0.10.0
     version: 0.10.0
   svelte-tel-input:
-    specifier: ^2.1.1
-    version: 2.1.1
+    specifier: ^3.0.0
+    version: 3.0.0
 
 devDependencies:
   '@sveltejs/adapter-cloudflare':
@@ -103,8 +103,8 @@ devDependencies:
     specifier: ^4.3.8
     version: 4.3.8
   vite-plugin-image-optimizer:
-    specifier: ^1.1.4
-    version: 1.1.4(vite@4.3.8)
+    specifier: ^1.1.5
+    version: 1.1.5(vite@4.3.8)
   vite-plugin-iso-import:
     specifier: ^1.0.0
     version: 1.0.0(vite@4.3.8)
@@ -2910,8 +2910,8 @@ packages:
       typescript: 5.0.4
     dev: true
 
-  /svelte-tel-input@2.1.1:
-    resolution: {integrity: sha512-JkQZULnrPVR6V1InrcH3OUcpTHRp5+0kLpFgwMJpmU0EoS7eVShTw0A93kPHnoNOA16M9s4zOFe+EsrFlvYxOQ==}
+  /svelte-tel-input@3.0.0:
+    resolution: {integrity: sha512-jkUDGT+VsBQyDBEGEU8SftYwqtBZr3zMuImR9XHdifQiRclv/a0slg2IV8PaAoCvE4VboHDY7bm7IlR45qAdOQ==}
     engines: {node: '>= 16', npm: '>= 8', pnpm: '>= 7', yarn: '>=2'}
     dependencies:
       libphonenumber-js: 1.10.30
@@ -3146,8 +3146,8 @@ packages:
       which-typed-array: 1.1.9
     dev: true
 
-  /vite-plugin-image-optimizer@1.1.4(vite@4.3.8):
-    resolution: {integrity: sha512-DgJ6OwbF5QJgFfPEP2mvx3a8xCJUb5As1rVVY+S/5m8+x9D9lFivWy6bGxjweyskzY0qpEp8ITLfivypaQ49eQ==}
+  /vite-plugin-image-optimizer@1.1.5(vite@4.3.8):
+    resolution: {integrity: sha512-AiN3ztY6mC/YDaTjzXWdPCaN+Hf2nXSGuC8oyJZad3sx6IDvROYJtKM5Hh8403gzVRWma69GZBgiIzskSF6Ztg==}
     engines: {node: '>=14'}
     peerDependencies:
       vite: '>=3'

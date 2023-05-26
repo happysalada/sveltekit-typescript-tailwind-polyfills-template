@@ -4,7 +4,7 @@
   import { TelInput, normalizedCountries, isSelected, clickOutsideAction } from "svelte-tel-input";
 
 	import type {
-		NormalizedTelNumber,
+		DetailedValue,
 		CountrySelectEvents,
 		CountryCode,
 		E164Number,
@@ -16,7 +16,7 @@
 	export let disabled = false;
 	// Disabled in favour of enabled autoPlaceholder.
 	// export let placeholder: string | null = null;
-	export let parsedTelInput: NormalizedTelNumber | null = null;
+	export let detailedValue: DetailedValue | null = null;
 	export let value: E164Number | null;
 	export let searchPlaceholder: string | null = 'Search';
 
@@ -183,7 +183,7 @@
 		name="rawPhone"
 		autocomplete="tel"
 		bind:country={selectedCountry}
-		bind:parsedTelInput
+		bind:detailedValue
 		bind:value
 		bind:valid
 		{options}

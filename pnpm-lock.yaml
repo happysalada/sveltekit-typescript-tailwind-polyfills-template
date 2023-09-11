@@ -14,15 +14,9 @@ dependencies:
   email-validator:
     specifier: ^2.0.4
     version: 2.0.4
-  leaflet:
-    specifier: ^1.9.4
-    version: 1.9.4
   surrealdb.js:
     specifier: ^0.8.4
     version: 0.8.4
-  svelte-leafletjs:
-    specifier: ^0.10.0
-    version: 0.10.0
   svelte-tel-input:
     specifier: ^3.3.6
     version: 3.3.6(svelte@4.2.0)
@@ -1989,10 +1983,6 @@ packages:
     resolution: {integrity: sha512-9pSL5XB4J+ifHP0e0jmmC98OGC1nL8/JjS+fi6mnTlIf//yt/MfVLtKg7S6nCtj/8KTcWX7nRlY0XywoYY1ISQ==}
     dev: true
 
-  /leaflet@1.9.4:
-    resolution: {integrity: sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA==}
-    dev: false
-
   /levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
@@ -2980,12 +2970,6 @@ packages:
     dependencies:
       svelte: 4.2.0
     dev: true
-
-  /svelte-leafletjs@0.10.0:
-    resolution: {integrity: sha512-xKIwHZAsdI2EoYvSEp4IDAeLFTaWx/e+gPs7G3Z6MLHNcFieDRKjVHgLt9ilM+xpw1A8Cx0qbtwrfdCYwWfG8g==}
-    dependencies:
-      leaflet: 1.9.4
-    dev: false
 
   /svelte-local-storage-store@0.6.0(svelte@4.2.0):
     resolution: {integrity: sha512-UbCY/yT/YUadU5IX/gZkoRQnA+ebFZHKKQjlJvfWHnBj3CPe9sNn8ndxYz/xy4LUzGjuBLq8+wH5RYK54ba3wA==}

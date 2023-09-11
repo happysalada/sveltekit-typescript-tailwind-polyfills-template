@@ -48,9 +48,7 @@
 		"awesome-phonenumber": "^5.10.0",
 		"country-list": "^2.3.0",
 		"email-validator": "^2.0.4",
-		"leaflet": "^1.9.4",
 		"surrealdb.js": "^0.8.4",
-		"svelte-leafletjs": "^0.10.0",
 		"svelte-tel-input": "^3.3.6"
 	}
 }

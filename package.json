@@ -30,7 +30,7 @@
 		"sharp": "^0.32.6",
 		"svelte": "^4.2.1",
 		"svelte-check": "^3.5.1",
-		"svelte-local-storage-store": "^0.6.0",
+		"svelte-local-storage-store": "^0.6.4",
 		"svelte-preprocess": "^5.0.4",
 		"sveltekit-superforms": "^1.7.0",
 		"svgo": "^3.0.2",

@@ -45,7 +45,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"awesome-phonenumber": "^5.10.0",
+		"awesome-phonenumber": "^6.0.0",
 		"country-list": "^2.3.0",
 		"email-validator": "^2.0.4",
 		"surrealdb.js": "^0.9.1",

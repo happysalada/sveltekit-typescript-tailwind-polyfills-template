@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   awesome-phonenumber:
-    specifier: ^6.0.0
-    version: 6.0.0
+    specifier: ^6.1.0
+    version: 6.1.0
   country-list:
     specifier: ^2.3.0
     version: 2.3.0
@@ -859,8 +859,8 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /awesome-phonenumber@6.0.0:
-    resolution: {integrity: sha512-9OzZgUuUjrfRB3hIBN0M7eDoSwr+dTQfNcGGAKeU/kcD5/3msbo+14CdmySXtP+kWTz7olvYZOSs1KjrnnRU+g==}
+  /awesome-phonenumber@6.1.0:
+    resolution: {integrity: sha512-cYv2GNf6JHIn7hMD7EMMh4VDwJDu/ej6J061id0cJW1INTUc+2/N7rDWNAJxxmPf6ZnEJwPzLCvDylpPoIMStQ==}
     engines: {node: '>=18'}
     dev: false
 

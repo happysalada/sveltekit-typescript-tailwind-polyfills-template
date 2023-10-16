@@ -24,7 +24,7 @@
 		"node-stdlib-browser": "^1.2.0",
 		"postcss": "^8.4.31",
 		"postcss-load-config": "^4.0.1",
-		"postcss-scss": "^4.0.8",
+		"postcss-scss": "^4.0.9",
 		"prettier": "^3.0.3",
 		"prettier-plugin-svelte": "^3.0.3",
 		"sharp": "^0.32.6",

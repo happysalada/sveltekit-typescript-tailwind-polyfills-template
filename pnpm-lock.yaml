@@ -83,8 +83,8 @@ devDependencies:
     specifier: ^5.0.4
     version: 5.0.4(postcss-load-config@4.0.1)(postcss@8.4.31)(svelte@4.2.1)(typescript@5.2.2)
   sveltekit-superforms:
-    specifier: ^1.7.0
-    version: 1.7.0(@sveltejs/kit@1.25.0)(svelte@4.2.1)(zod@3.22.2)
+    specifier: ^1.8.0
+    version: 1.8.0(@sveltejs/kit@1.25.0)(svelte@4.2.1)(zod@3.22.2)
   svgo:
     specifier: ^3.0.2
     version: 3.0.2
@@ -3099,8 +3099,8 @@ packages:
       magic-string: 0.30.3
       periscopic: 3.1.0
 
-  /sveltekit-superforms@1.7.0(@sveltejs/kit@1.25.0)(svelte@4.2.1)(zod@3.22.2):
-    resolution: {integrity: sha512-mHfQp2sps2K55zsf3GdowgdokYDl5N4IOanHL/Ydi7F+YL5I9Ry2CrZoCIB4uPaX0/hUKW5DbAcHPLGq+sAAaQ==}
+  /sveltekit-superforms@1.8.0(@sveltejs/kit@1.25.0)(svelte@4.2.1)(zod@3.22.2):
+    resolution: {integrity: sha512-ig4SJNe72UNlmL2FjXk6Z3I7WYEm+qerA8PB4WOjQkOirztiDNJrY/bs1lF8VLxc56TSG9JQkCtZkgUdlH3yYA==}
     peerDependencies:
       '@sveltejs/kit': 1.x
       svelte: 3.x || 4.x

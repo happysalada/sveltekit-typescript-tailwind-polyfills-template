@@ -18,8 +18,8 @@ dependencies:
     specifier: ^0.9.1
     version: 0.9.1
   svelte-tel-input:
-    specifier: ^3.3.6
-    version: 3.3.6(svelte@4.2.2)
+    specifier: ^3.3.8
+    version: 3.3.8(svelte@4.2.2)
 
 devDependencies:
   '@sveltejs/adapter-cloudflare':
@@ -3078,9 +3078,9 @@ packages:
       typescript: 5.2.2
     dev: true
 
-  /svelte-tel-input@3.3.6(svelte@4.2.2):
-    resolution: {integrity: sha512-V28iuPXzbCZ14FeiguCDwPV8mkCzsYWMB2AVOkf5qW6qlMfPDsLdfn0et7dsJbkzI4ey5rrVwh04yU22vT6+qA==}
-    engines: {node: '>= 18', npm: '>= 8', pnpm: '>= 8', yarn: '>= 2'}
+  /svelte-tel-input@3.3.8(svelte@4.2.2):
+    resolution: {integrity: sha512-TKa+GAPMkEep8IdRxZAOA/aAvfFETy91aEEqrTRUzcwKfuUo2JEOw7nsOw7djW75bxOtzkrFgsdUh5ni/9Atxw==}
+    engines: {node: '>= 18', npm: '>= 8', pnpm: '>= 8', yarn: '>= 1'}
     peerDependencies:
       svelte: ^3.58.0 || ^4.0.0
     dependencies:

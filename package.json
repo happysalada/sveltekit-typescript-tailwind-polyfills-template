@@ -49,6 +49,6 @@
 		"country-list": "^2.3.0",
 		"email-validator": "^2.0.4",
 		"surrealdb.js": "^0.9.1",
-		"svelte-tel-input": "^3.3.6"
+		"svelte-tel-input": "^3.3.8"
 	}
 }

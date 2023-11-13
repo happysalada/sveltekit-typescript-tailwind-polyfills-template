@@ -14,7 +14,7 @@
         pkgs = import nixpkgs {
           inherit system overlays;
         };
-        packages = with pkgs; [
+        dev_packages = with pkgs; [
           nodejs_latest
           nodePackages_latest.dotenv-cli
           npm-check-updates
@@ -22,10 +22,17 @@
           # db
           surrealdb-migrations
         ];
+        modules = import ./nix/modules;
+        packages = import ./nix/packages { inherit pkgs; };
       in
       {
+        nixosModules = modules;
+        packages = packages;
+        # overlays.default = final: prev: {
+        #   inherit (packages) brocop brocop_admin;
+        # };
         devShell = pkgs.devshell.mkShell {
-          inherit packages;
+          packages = dev_packages;
           env = [
             {
               name = "PUBLIC_ENVIRONMENT";

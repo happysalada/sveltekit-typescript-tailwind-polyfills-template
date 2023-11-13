@@ -2,7 +2,7 @@
   description = "Just a shell for now";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     devshell.url = "github:numtide/devshell";
     devshell.inputs.nixpkgs.follows = "nixpkgs";
   };
@@ -15,8 +15,12 @@
           inherit system overlays;
         };
         packages = with pkgs; [
-          nodejs-slim
-          nodePackages_latest.pnpm
+          nodejs_latest
+          nodePackages_latest.dotenv-cli
+          npm-check-updates
+
+          # db
+          surrealdb-migrations
         ];
       in
       {
@@ -24,16 +28,8 @@
           inherit packages;
           env = [
             {
-              name = "PUBLIC_SURREAL_URL";
-              value = "";
-            }
-            {
-              name = "PUBLIC_SURREAL_NAMESPACE";
-              value = "test";
-            }
-            {
-              name = "PUBLIC_SURREAL_DATABASE";
-              value = "rex";
+              name = "PUBLIC_ENVIRONMENT";
+              value = "development";
             }
           ];
           commands = [
@@ -43,33 +39,31 @@
               help = "Clean the package manager directory and local direnv";
               command = ''
                 direnv prune
-                pnpm prune
-                pnpm store prune
               '';
             }
             {
               name = "dev";
               category = "dev";
               help = "Start dev server locally";
-              command = "pnpm run dev";
+              command = "npm run dev";
             }
             {
               name = "deps_update";
               category = "dev";
               help = "update dependencies";
-              command = "pnpm up --interactive --latest";
+              command = "ncu -ui";
             }
             {
               name = "build";
               category = "dev";
               help = "build the project for release";
-              command = "pnpm run build";
+              command = "npm run build";
             }
             {
               name = "preview";
               category = "dev";
               help = "preview the release build";
-              command = "pnpm run preview";
+              command = "npm run preview";
             }
           ];
         };

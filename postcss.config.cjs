@@ -2,7 +2,6 @@ const tailwindcss = require("tailwindcss");
 const autoprefixer = require("autoprefixer");
 
 const config = {
-  syntax: 'postcss-scss',
   plugins: [
     //Some plugins, like tailwindcss/nesting, need to run before Tailwind,
     tailwindcss(),

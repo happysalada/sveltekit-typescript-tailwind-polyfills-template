@@ -35,3 +35,67 @@ export const extract_log_params = ({ status }: { status: number }, event: any) =
     ...(referer ? { referer } : {})
   }
 }
+
+export const adminNotification = async ({
+  topic,
+  title,
+  tags,
+  message,
+  fetch,
+  url
+}: {
+  topic: string;
+  title: string;
+  tags: string;
+  message: string;
+  fetch: any;
+  url: any;
+}) => url ?
+    await fetch(`${url}/${topic}`, {
+      method: 'POST', // PUT works too
+      headers: {
+        Title: title,
+        Tags: tags
+      },
+      body: message
+    }) : Promise.resolve(true)
+
+export const emailNotification = async ({
+  resendApiKey,
+  subject,
+  content,
+  email,
+  fetch,
+  logger,
+}: {
+  subject: string;
+  content: string;
+  resendApiKey: string | undefined;
+  email: string;
+  fetch: any;
+  logger: any;
+}) => {
+  if (!resendApiKey) return
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${resendApiKey}`
+      },
+      body: JSON.stringify({
+        from: 'admin@brocop.com',
+        to: email,
+        subject,
+        html: content,
+      })
+    });
+
+    const json = await res.json();
+    logger.info({ message: "email notification response", email, subject, json })
+    return json;
+  } catch (e) {
+    logger.error({ error: (e as Error).toString(), message: "failure to send email notification", email })
+  }
+};
+

@@ -1,165 +1,157 @@
 <script lang="ts">
-  let firstName: string,
-    lastName: string,
-    email: string,
-    phone: string,
-    message: string;
+  import { superForm } from 'sveltekit-superforms/client';
+  export let contactForm: any;
+  import TextInput from '$lib/atoms/TextInput.svelte';
+  import EmailInput from '$lib/atoms/EmailInput.svelte';
 
-  let submitted = false;
-
-  async function contact() {
-    submitted = true;
-    const url = "https://formsubmit.co/ajax/raphael@sassy.technology";
-    const response = await fetch(url, {
-      method: "POST", // *GET, POST, PUT, DELETE, etc.
-      headers: {
-        "Content-Type": "application/json", // *For JSON data, use 'application/json'. For form data, use 'application/x-www-form-urlencoded'.
-        // Add any additional headers if needed
-      },
-      body: JSON.stringify({
-        firstName,
-        lastName,
-        email,
-        phone,
-        message,
-      }), // Convert the JavaScript object to a JSON string
-    });
-    console.log(response);
-    firstName = "";
-    lastName = "";
-    email = "";
-    phone = "";
-    message = "";
+  enum State {
+    Input,
+    Submitted
   }
+  let state = State.Input;
+  let emailValid = false;
+
+  const { form, enhance, errors, constraints } = superForm(contactForm, {
+    validators: {
+      first_name: (input) => (input ? undefined : 'Please add your first name'),
+      last_name: (input) => (input ? undefined : 'Please add your last name'),
+      phone: (input) => (input ? undefined : 'Please add your phone number'),
+      message: (input) => (input ? undefined : 'Please write a message')
+    },
+    onError({ result, message }) {
+      console.log(result);
+      console.log(message);
+    },
+    resetForm: true,
+    onResult({ result }) {
+      if (result.type === 'success') {
+        state = State.Submitted;
+      } else if (result.type === 'failure') {
+        console.log(result);
+      }
+    }
+  });
 </script>
 
 <section id="contact" class="bg-white dark:bg-gray-900">
   <div
     class="bg-[url('https://flowbite.s3.amazonaws.com/blocks/marketing-ui/contact/laptop-human.jpg')] bg-no-repeat bg-cover bg-center bg-gray-700 bg-blend-multiply"
   >
-    <div
-      class="px-4 lg:pt-24 pt-8 pb-72 lg:pb-80 mx-auto max-w-screen-sm text-center lg:px-6 "
-    >
-      <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-white">
-        Contact Us
-      </h2>
+    <div class="px-4 lg:pt-24 pt-8 pb-72 lg:pb-80 mx-auto max-w-screen-sm text-center lg:px-6">
+      <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-white">Contact Us</h2>
       <p class="mb-16 font-light text-gray-400 sm:text-xl">
-        We use an agile approach to test assumptions and connect with the needs
-        of your audience early and often.
+        We use an agile approach to test assumptions and connect with the needs of your audience
+        early and often.
       </p>
     </div>
   </div>
-  <div class="py-16 px-4 mx-auto -mt-96 max-w-screen-xl sm:py-24 lg:px-6 ">
+  <div class="py-16 px-4 mx-auto -mt-96 max-w-screen-xl sm:py-24 lg:px-6">
     <form
-      action="#"
+      action="?/createContact"
+      method="POST"
+      use:enhance
       class="grid grid-cols-1 gap-8 p-6 mx-auto mb-16 max-w-screen-md bg-white rounded-lg border border-gray-200 shadow-sm lg:mb-28 dark:bg-gray-800 dark:border-gray-700 sm:grid-cols-2"
     >
       <div>
-        <label
-          for="first-name"
-          class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-          >First Name</label
-        >
-        <input
-          type="text"
-          id="first-name"
-          class="block p-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 dark:shadow-sm-light"
-          placeholder="Bruce"
-          bind:value={firstName}
-          required
+        <TextInput
+          label="First Name"
+          id="first_name"
+          name="first_name"
+          placeholder="Jay"
+          error={$errors.first_name}
+          bind:value={$form.first_name}
+          constraints={$constraints.first_name}
+          autocomplete="given-name"
         />
       </div>
       <div>
-        <label
-          for="last-name"
-          class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-          >Last Name</label
-        >
-        <input
-          type="text"
-          id="last-name"
-          class="block p-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 dark:shadow-sm-light"
-          placeholder="Wayne"
-          bind:value={lastName}
-          required
+        <TextInput
+          label="Last Name"
+          id="last_name"
+          name="last_name"
+          placeholder="Gatsby"
+          error={$errors.last_name}
+          bind:value={$form.last_name}
+          constraints={$constraints.last_name}
+          autocomplete="family-name"
         />
       </div>
       <div>
-        <label
-          for="email"
-          class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-          >Your email</label
-        >
-        <input
-          type="email"
+        <EmailInput
+          label="Email"
           id="email"
-          class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 dark:shadow-sm-light"
-          placeholder="name@rex1031.com"
-          bind:value={email}
-          required
+          name="email"
+          placeholder="you@example.com"
+          bind:error={$errors.email}
+          bind:value={$form.email}
+          constraints={$constraints.email}
+          autocomplete="email"
+          success={emailValid}
         />
       </div>
       <div>
-        <label
-          for="phone-number"
-          class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-          >Phone Number</label
-        >
-        <input
-          type="number"
-          id="phone-number"
-          class="block p-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 dark:shadow-sm-light"
-          placeholder="+12 345 6789"
-          bind:value={phone}
+        <TextInput
+          label="Phone number"
+          id="phone"
+          name="phone"
+          placeholder=""
+          error={$errors.phone}
+          bind:value={$form.phne}
+          constraints={$constraints.phone}
+          autocomplete="phone"
         />
       </div>
       <div class="sm:col-span-2">
-        <label
-          for="message"
-          class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
+        <label for="message" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
           >Your message</label
         >
-        <textarea
-          id="message"
-          rows="6"
-          class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg shadow-sm border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-          placeholder="Leave a comment..."
-          bind:value={message}
-        />
+
+        <div class="mt-2.5">
+          <textarea
+            name="message"
+            id="message"
+            rows="4"
+            class="block w-full rounded-md border-0 py-1.5 pr-10 {$errors.message
+              ? 'text-red-900 placeholder:text-red-300 ring-red-300 focus:ring-red-500'
+              : 'text-gray-900 ring-gray-300 focus:ring-primary-500'} ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
+            aria-invalid={$errors.message != undefined}
+            aria-describedby={$errors.message != undefined ? 'message-error' : ''}
+            data-invalid={$errors.message}
+            bind:value={$form.message}
+            {...$constraints.message}
+          />
+        </div>
+        {#if $errors.message}
+          <p class="mt-2 text-sm text-red-600" id="message-error">
+            {$errors.message}
+          </p>
+        {/if}
         <p class="mt-4 text-sm text-gray-500">
           By submitting this form you agree to our <a
-            href="#"
-            class="text-primary-600 hover:underline dark:text-primary-500"
-            >terms and conditions</a
+            href="/terms"
+            class="text-primary-600 hover:underline dark:text-primary-500">terms and conditions</a
           >
           and our
-          <a
-            href="#"
-            class="text-primary-600 hover:underline dark:text-primary-500"
+          <a href="/privacy" class="text-primary-600 hover:underline dark:text-primary-500"
             >privacy policy</a
-          > which explains how we may collect, use and disclose your personal information
-          including to third parties.
+          > which explains how we may collect, use and disclose your personal information including to
+          third parties.
         </p>
       </div>
-      {#if !submitted}
+      {#if state == State.Input}
         <button
-          type="button"
-          on:click={contact}
           class="py-3 px-5 text-sm font-medium text-center text-white rounded-lg bg-primary-700 sm:w-fit hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
           >Send message</button
         >
       {:else}
         <button
-          type="button"
           disabled
           class="py-3 px-5 text-sm font-medium text-center text-white rounded-lg bg-gray-700 sm:w-fit focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
           >Thank you! We will be in touch shortly</button
         >
       {/if}
     </form>
-    <div
-      class="space-y-8 text-center md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-12 md:space-y-0"
-    >
+    <div class="space-y-8 text-center md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-12 md:space-y-0">
       <div>
         <div
           class="flex justify-center items-center mx-auto mb-4 w-10 h-10 bg-gray-100 rounded-lg dark:bg-gray-800 lg:h-16 lg:w-16"
@@ -171,15 +163,12 @@
             xmlns="http://www.w3.org/2000/svg"
             ><path
               d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"
-            /><path
-              d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"
-            /></svg
+            /><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg
           >
         </div>
         <p class="mb-2 text-xl font-bold dark:text-white">Email us:</p>
         <p class="mb-3 text-gray-500 dark:text-gray-400">
-          Email us for general queries, including marketing and partnership
-          opportunities.
+          Email us for general queries, including marketing and partnership opportunities.
         </p>
         <a
           href="mailto:abc@example.com"
@@ -205,9 +194,7 @@
         <p class="mb-3 text-gray-500 dark:text-gray-400">
           Call us to speak to a member of our team. We are always happy to help.
         </p>
-        <span class="font-semibold text-primary-600 dark:text-primary-500"
-          >+1 (646) 786-5060</span
-        >
+        <span class="font-semibold text-primary-600 dark:text-primary-500">+1 (646) 786-5060</span>
       </div>
       <div>
         <div
@@ -227,8 +214,7 @@
         </div>
         <p class="mb-2 text-xl font-bold dark:text-white">Support</p>
         <p class="mb-3 text-gray-500 dark:text-gray-400">
-          Email us for general queries, including marketing and partnership
-          opportunities.
+          Email us for general queries, including marketing and partnership opportunities.
         </p>
         <a
           href="#"

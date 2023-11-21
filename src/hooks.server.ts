@@ -31,7 +31,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   const logger = serverLogger();
   event.locals.logger = logger;
 
-  if (event.route.id == '/logs') {
+  if (event.route.id == '/api/logs') {
     if (!user_id) throw error(400)
     return await resolve(event);
   }

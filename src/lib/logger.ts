@@ -6,7 +6,7 @@ export const browserLogger = pino({
     transmit: {
       level: 'info',
       send: async function(level: string, logEvent: LogEvent) {
-        const res = await fetch('/logs', {
+        const res = await fetch('/api/logs', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

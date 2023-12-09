@@ -5,19 +5,34 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     devshell.url = "github:numtide/devshell";
     devshell.inputs.nixpkgs.follows = "nixpkgs";
+    nuenv.url = "github:DeterminateSystems/nuenv";
+    nuenv.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { nixpkgs, flake-utils, devshell, ... }:
+  outputs = { nixpkgs, flake-utils, devshell, nuenv, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        overlays = [ devshell.overlays.default ];
+        overlays = [ devshell.overlays.default nuenv.overlays.default ];
         pkgs = import nixpkgs {
           inherit system overlays;
+          config.allowUnfree = true;
+        };
+        update-dependencies = pkgs.nuenv.writeScriptBin {
+          name = "ud";
+          script = ''
+            ncu -ui
+            let $hash = (prefetch-npm-deps package-lock.json)
+            let $new_content = (open ./nix/packages/pin.json | update hash $hash)
+            $new_content | to json | save ./nix/packages/pin.json --force
+          '';
         };
         dev_packages = with pkgs; [
           nodejs_latest
           nodePackages_latest.dotenv-cli
           npm-check-updates
+          prefetch-npm-deps
+          # update dependencies with nix
+          update-dependencies
 
           # db
           surrealdb-migrations

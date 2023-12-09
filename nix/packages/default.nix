@@ -1,10 +1,11 @@
 { pkgs }:
 let
+  pin = pkgs.lib.importJSON ./pin.json;
   common_attributes = {
     version = "0.0.1";
     src = ./../..;
-    # nodejs = nodejs_latest;
-    npmDepsHash = "";
+    nodejs = pkgs.nodejs_latest;
+    npmDepsHash = pin.hash;
     makeCacheWritable = true;
     env.PUBLIC_ENVIRONMENT = "production";
 

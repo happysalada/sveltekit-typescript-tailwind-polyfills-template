@@ -11,8 +11,9 @@ export const handleError: HandleServerError = async ({ error, event }) => {
   //@ts-ignore
   event.locals.errorStackTrace = error?.stack || undefined;
   event.locals.errorId = errorId;
-  let req_params = extract_log_params({ status: 500 }, event);
-  const message = 'An unexpected error occurred.';
+  let status = error?.toString()?.includes("Not found") ? 404 : 500;
+  let req_params = extract_log_params({ status }, event);
+  const message = status == 404 ? 'Page not found' : 'An unexpected error occurred.';
   serverLogger().error({ ...req_params, message });
 
   return {

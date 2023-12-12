@@ -1,9 +1,10 @@
 export const extract_log_params = ({ status }: { status: number }, event: any) => {
-  const level = (status >= 400) ? 'error' : 'info';
+  const level = status == 404 ? 'warning' : ((status >= 500) ? 'error' : 'info');
   const error = event?.locals?.error || undefined;
   const errorId = event?.locals?.errorId || undefined;
   const errorStackTrace = event?.locals?.errorStackTrace || undefined;
-  const urlParams = Object.fromEntries(event?.url?.searchParams);
+  // doesn't work with prerendering
+  // const urlParams = Object.fromEntries(event?.url?.searchParams);
 
   let referer = event.request.headers.get('referer');
   if (referer) {
@@ -31,7 +32,7 @@ export const extract_log_params = ({ status }: { status: number }, event: any) =
     ...(error ? { error } : {}),
     ...(errorId ? { errorId } : {}),
     ...(errorStackTrace ? { errorStackTrace } : {}),
-    ...(Object.keys(urlParams).length !== 0 ? { urlParams } : {}),
+    // ...(Object.keys(urlParams).length !== 0 ? { urlParams } : {}),
     ...(referer ? { referer } : {})
   }
 }

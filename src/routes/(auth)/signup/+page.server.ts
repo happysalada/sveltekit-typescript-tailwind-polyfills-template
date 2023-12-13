@@ -54,13 +54,13 @@ export const actions = {
         password: form.data.password.trim()
       });
       // TODO set secure to true the future
-      cookies.set('jwt', jwt, { httpOnly: true, sameSite: 'strict', maxAge: ONE_DAY });
+      cookies.set('jwt', jwt, { httpOnly: true, sameSite: 'strict', maxAge: ONE_DAY, path: '/' });
       const [[user]]: [[User]] = await db.query(`
         SELECT * FROM user WHERE email = $email;
       `, {
         email: form.data.email,
       });
-      cookies.set('user_id', user.id, { httpOnly: true, sameSite: 'strict', maxAge: ONE_DAY });
+      cookies.set('user_id', user.id, { httpOnly: true, sameSite: 'strict', maxAge: ONE_DAY, path: '/' });
       // const admin_notification_promise = adminNotification({
       //   topic: 'brocop_signup',
       //   title: `New Signup!`,

@@ -56,11 +56,11 @@ export const actions = {
         password: form.data.password.trim()
       });
       // TODO set secure to true the future
-      cookies.set('jwt', jwt, { httpOnly: true, sameSite: 'lax', maxAge: ONE_DAY });
+      cookies.set('jwt', jwt, { httpOnly: true, sameSite: 'lax', maxAge: ONE_DAY, path: '/' });
       const [[user]]: [[User]] = await db.query(`SELECT * FROM user WHERE email = $email`, {
         email: form.data.email
       });
-      cookies.set('user_id', user.id, { httpOnly: true, sameSite: 'lax', maxAge: ONE_DAY });
+      cookies.set('user_id', user.id, { httpOnly: true, sameSite: 'lax', maxAge: ONE_DAY, path: '/' });
     } catch (e) {
       console.log(e);
       setError(form, 'email', 'Invalid email password combination');

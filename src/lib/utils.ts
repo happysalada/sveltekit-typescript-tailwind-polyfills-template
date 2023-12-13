@@ -29,9 +29,9 @@ export const extract_log_params = ({ status }: { status: number }, event: any) =
     level,
     ...(event.locals?.user ? { user: event.locals.user.email } : {}),
     ...(event.locals?.user_id ? { user_id: event.locals.user_id } : {}),
-    ...(error ? { error } : {}),
+    ...(error && status != 404 ? { error } : {}),
     ...(errorId ? { errorId } : {}),
-    ...(errorStackTrace ? { errorStackTrace } : {}),
+    ...(errorStackTrace && status != 404 ? { errorStackTrace } : {}),
     // ...(Object.keys(urlParams).length !== 0 ? { urlParams } : {}),
     ...(referer ? { referer } : {})
   }

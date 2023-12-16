@@ -1,13 +1,13 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
-import nodePolyfills from 'vite-plugin-node-stdlib-browser'
-import { isoImport } from 'vite-plugin-iso-import'
+// import nodePolyfills from 'vite-plugin-node-stdlib-browser'
+// import { isoImport } from 'vite-plugin-iso-import'
+import type { UserConfig } from "vite";
 
-/** @type {import('vite').UserConfig} */
-const config = {
+const config: UserConfig = {
 	plugins: [
-		isoImport(),
-		nodePolyfills(),
+		// isoImport(),
+		// nodePolyfills(),
 		sveltekit(),
 		ViteImageOptimizer({})
 	],

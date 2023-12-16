@@ -4,16 +4,14 @@ import { env } from '$env/dynamic/private';
 import Surreal from 'surrealdb.js';
 import { serverLogger } from '$lib/logger';
 
-export const handleError: HandleServerError = async ({ error, event }) => {
+export const handleError: HandleServerError = async ({ error, event, status, message }) => {
   const errorId = crypto.randomUUID();
 
   event.locals.error = error?.toString() || undefined;
   //@ts-ignore
   event.locals.errorStackTrace = error?.stack || undefined;
   event.locals.errorId = errorId;
-  let status = error?.toString()?.includes("Not found") ? 404 : 500;
   let req_params = extract_log_params({ status }, event);
-  const message = status == 404 ? 'Page not found' : 'An unexpected error occurred.';
   serverLogger().error({ ...req_params, message });
 
   return {
@@ -33,14 +31,14 @@ export const handle: Handle = async ({ event, resolve }) => {
   event.locals.logger = logger;
 
   if (event.route.id == '/api/logs') {
-    if (!user_id) throw error(400)
+    if (!user_id) error(400);
     return await resolve(event);
   }
 
   if (event.route.id?.startsWith('/(protected)')) {
     const redirect_url = `/signin?from=${event.url.pathname}`;
     const jwt: string | undefined = event.cookies.get('jwt');
-    if (!user_id || !jwt) throw redirect(302, redirect_url);
+    if (!user_id || !jwt) redirect(302, redirect_url);
     const db = new Surreal();
     // TODO wrap in try catch
     await db.connect(`${env.SURREAL_URL}/rpc`, {
@@ -52,15 +50,15 @@ export const handle: Handle = async ({ event, resolve }) => {
         logger.error({ error: (e as Error).toString(), message: "authentication failure", route: event.route })
         return false
       })
-    if (!authenticated) throw redirect(303, redirect_url);
+    if (!authenticated) redirect(303, redirect_url);
     const [[user]]: [[User]] = await db.query(
       `SELECT * FROM $user_id;`, { user_id }
     )
     if (!user) {
-      event.cookies.delete('jwt');
-      event.cookies.delete('user_id');
+      event.cookies.delete('jwt', { path: "/" });
+      event.cookies.delete('user_id', { path: "/" });
       logger.info({ message: "user_missing", user_id, routes: event.route })
-      throw redirect(303, redirect_url);
+      redirect(303, redirect_url);
     }
     event.locals.user = user
     event.locals.surreal = db;

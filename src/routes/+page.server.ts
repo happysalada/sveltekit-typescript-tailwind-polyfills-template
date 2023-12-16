@@ -51,7 +51,7 @@ export const actions = {
 
     } catch (e) {
       locals.logger.error({ message: "error submitting contact info", error: (e as Error).toString(), form })
-      throw error(500, 'An error occured, please try again later');
+      error(500, 'An error occured, please try again later');
     }
   }
 } satisfies Actions;
